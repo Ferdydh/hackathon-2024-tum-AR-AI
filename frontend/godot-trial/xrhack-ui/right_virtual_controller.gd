@@ -21,40 +21,33 @@ func send_screenshot():
 		print("Failed to capture the viewport image")
 		return
 
-	# Convert the image to PNG format and get it as raw binary data
-	var image_data = viewport_image.save_png_to_buffer()
+	# Convert the image to JPEG format and get it as raw binary data
+	var image_data = viewport_image.save_jpg_to_buffer()  # Saving as JPG since your cURL example uses JPEG
 
-	# Generate a unique boundary
-	var crypto = Crypto.new()
-	var random_bytes = crypto.generate_random_bytes(16)
-	var boundary = "GODOT%s" % random_bytes.hex_encode()
+	# Set up the multipart form-data, including binary data as part of an array `image`
+	var boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"  # Standard boundary for multipart requests
 	
-	# Formulate the multipart data for the image
+	# Formulate the multipart data, including binary data
 	var form_body = "--" + boundary + "\r\n"
-	form_body += 'Content-Disposition: form-data; name="file"; filename="screenshot.png"\r\n'
-	form_body += "Content-Type: image/png\r\n\r\n"
+	form_body += 'Content-Disposition: form-data; name="image"; filename="screenshot.jpg"\r\n'
+	form_body += "Content-Type: image/jpeg\r\n\r\n"
 	
-	# Convert form_body to bytes
-	var form_body_bytes = form_body.to_utf8()
-	
-	# Append the image data
+	var form_body_bytes = form_body.to_utf8_buffer()
 	form_body_bytes.append_array(image_data)  # Append raw binary image data
-	
-	# Append closing boundary
-	var closing_boundary = "\r\n--" + boundary + "--\r\n"
-	form_body_bytes.append_array(closing_boundary.to_utf8())
+	form_body_bytes.append_array(("\r\n--" + boundary + "--\r\n").to_utf8_buffer())
 
-	# Set up the headers
+	# Set up the headers (multipart/form-data)
 	var headers = [
+		"accept: application/json",  # Add this to match your cURL command
 		"Content-Type: multipart/form-data; boundary=" + boundary
 	]
 
-	# Send the POST request using request_raw
+	# Send the POST request to localhost:8000/friends/
 	var err = http_request.request_raw(
-		"http://localhost:8000/friends",
-		headers,
-		HTTPClient.METHOD_POST,
-		form_body_bytes
+		"http://127.0.0.1:8000/friends/",  # The URL of your POST endpoint
+		headers,                           # Headers for the request
+		HTTPClient.METHOD_POST,            # HTTP method
+		form_body_bytes                    # Body containing the form data and image
 	)
 
 	if err != OK:
@@ -63,7 +56,7 @@ func send_screenshot():
 # Handle the response
 func _on_request_completed(result, response_code, headers, body):
 	print("Request completed with code: ", response_code)
-	print("Response: ", body.get_string_from_utf8())
+	print("Response: ", body.get_string_from_utf8())  # Convert body to string for readability
 
 # Called every frame to detect controller input
 func _process(delta):
