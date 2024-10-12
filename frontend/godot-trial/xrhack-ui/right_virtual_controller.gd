@@ -1,6 +1,7 @@
 extends XRController3D
 
 var http_request  # Reference to the dynamically created HTTPRequest node
+var canvas_layer  # Reference to the CanvasLayer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -8,6 +9,17 @@ func _ready():
 	http_request = HTTPRequest.new()
 	add_child(http_request)
 	http_request.connect("request_completed", Callable(self, "_on_request_completed"))
+	
+	# Get reference to the CanvasLayer node by going up and finding the sibling
+	canvas_layer = get_node("/root/Main/CanvasLayer")  # Adjust this based on your root node name
+	
+	# Check if canvas_layer is valid (exists in the scene)
+	if canvas_layer:
+		# Set CanvasLayer visibility to false initially (if hidden by default)
+		#canvas_layer.visible = false
+		print("CanvasLayer found and hidden initially.")
+	else:
+		print("Error: CanvasLayer not found! Verify the node path.")
 
 # Function to capture the current viewport and send the image in a POST request
 func send_screenshot():
@@ -56,7 +68,38 @@ func send_screenshot():
 # Handle the response
 func _on_request_completed(result, response_code, headers, body):
 	print("Request completed with code: ", response_code)
-	print("Response: ", body.get_string_from_utf8())  # Convert body to string for readability
+
+#	Comment out this code to see the screen
+	if response_code != 200:
+		print("No face")
+		return
+
+	# Parse the body as JSON
+	var json_result = body.get_string_from_utf8()
+	var json_parser = JSON.new()
+	var parse_result = json_parser.parse(json_result)
+
+	# Check if the parsing was successful (parse_result returns an int error code)
+	if parse_result != OK:
+		print("Error parsing JSON. Error code: ", parse_result)
+		return
+
+	# If successful, access the parsed data
+	var data = json_parser.data  # Get the resulting dictionary
+	var id = data.get("id", -1)  # Get the 'name' or default to "Unknown"
+	var name = data.get("name", "Unknown")  # Get the 'name' or default to "Unknown"
+	var details = data.get("details", [])  # Get the 'details' or default to an empty array
+	
+	print("Id", id)
+	print("Name: ", name)
+	print("Details: ", details)
+	
+	# Check if canvas_layer is valid before setting it to visible
+	if canvas_layer:
+		canvas_layer.visible = true  # Show the canvas layer when request is completed
+		canvas_layer.update_ui(name, details, id)  # Call update_ui() on the canvas layer script (if required)
+	else:
+		print("Error: CanvasLayer is null or not found! Double-check the node path.")
 
 # Called every frame to detect controller input
 func _process(delta):

@@ -43,7 +43,7 @@ async def create_new_friend(image: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="No face detected in the image")
 
     # Save to friend_list
-    id = friend_service.add_new_friend("New Friend", [], [embedding])
+    id = friend_service.add_new_friend("New Friend", [], embedding)
 
     # Return the newly added friend
     return friend_service.get_friend_by_id(id)
