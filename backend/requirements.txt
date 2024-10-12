@@ -1,6 +1,8 @@
-transformers
-torch
-pillow
+opencv-python
+matplotlib
+deepface
+tf-keras
 tensorflow
-numpy
-pandas
+fastapi
+uvicorn
+python-multipart
