@@ -1,4 +1,5 @@
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from .cv import extract_face_and_embedding
@@ -8,6 +9,17 @@ friend_service = FriendService()
 friend_service.create_tables_if_not_exist()
 app = FastAPI()
 
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/friends")
 def get_all_friends():
@@ -73,7 +85,6 @@ async def delete_friend(friend_id: int):
 @app.post("/friends/search_by_image")
 async def search_friend_by_image(image: UploadFile = File(...)):
     # Ensure the file is a valid image
-
     if not image.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Invalid image file")
 
