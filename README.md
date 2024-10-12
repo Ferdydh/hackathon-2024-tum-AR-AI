@@ -13,9 +13,9 @@ To run backend without docker:
 2. `pip install -r backend/requirements.txt`
 3. `uvicorn backend.server.app:app --reload`
 
-## Frontend (Unity)
+## Frontend (Godot)
 
-To run frontend: `run`
+To run frontend: install godot and ask eber how to
 
 ## To open database viewer:
 
