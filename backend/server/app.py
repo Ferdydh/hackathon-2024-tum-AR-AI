@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 # from fastapi import FastAPI, WebSocket
 # from fastapi.responses import HTMLResponse
-from ferdy import router
+from .ferdy import router
 
 app = FastAPI()
 app.include_router(router, prefix="/api")
