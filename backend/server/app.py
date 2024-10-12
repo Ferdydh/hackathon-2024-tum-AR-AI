@@ -1,5 +1,4 @@
 import asyncio
-from typing import Optional
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel
 
