@@ -86,16 +86,18 @@ func _on_request_completed(result, response_code, headers, body):
 
 	# If successful, access the parsed data
 	var data = json_parser.data  # Get the resulting dictionary
+	var id = data.get("id", -1)  # Get the 'name' or default to "Unknown"
 	var name = data.get("name", "Unknown")  # Get the 'name' or default to "Unknown"
 	var details = data.get("details", [])  # Get the 'details' or default to an empty array
 	
+	print("Id", id)
 	print("Name: ", name)
 	print("Details: ", details)
 	
 	# Check if canvas_layer is valid before setting it to visible
 	if canvas_layer:
 		canvas_layer.visible = true  # Show the canvas layer when request is completed
-		canvas_layer.update_ui(name, details)  # Call update_ui() on the canvas layer script (if required)
+		canvas_layer.update_ui(name, details, id)  # Call update_ui() on the canvas layer script (if required)
 	else:
 		print("Error: CanvasLayer is null or not found! Double-check the node path.")
 

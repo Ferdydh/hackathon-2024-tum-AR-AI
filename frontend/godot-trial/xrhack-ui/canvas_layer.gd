@@ -9,11 +9,16 @@ extends CanvasLayer
 
 # Variable to track if we are in edit mode
 var is_editing = false
+var http_request  # HTTPRequest node for PUT request
+var friend_id
 
 # Called when the node enters the scene tree
 func _ready():
 	# Initialize UI with default values
 	update_ui("Default Name", ["Detail 1", "Detail 2"])
+	
+#	Mocked for now
+	friend_id = 1
 	
 	# Connect the edit button to toggle between Edit and Save
 	edit_button.pressed.connect(_on_edit_button_pressed)
@@ -22,8 +27,16 @@ func _ready():
 	name_input.visible = false
 	details_input.visible = false
 
+	# Create and add the HTTPRequest node dynamically
+	http_request = HTTPRequest.new()
+	add_child(http_request)
+	http_request.connect("request_completed", Callable(self, "_on_request_completed"))
+
 # Function to update the UI dynamically
-func update_ui(friend_name: String, friend_detail_list: Array):
+func update_ui(friend_name: String, friend_detail_list: Array, optional_param: int = -1):
+	if optional_param != -1:
+		friend_id = optional_param
+	
 	# Update the name label
 	name_label.text = "Name: %s" % friend_name
 	
@@ -86,13 +99,60 @@ func start_editing():
 	
 	details_input.text = details_text
 
-# Function to save data (implementation to be added later)
+# Function to save data (now sends a PUT request)
 func save_data():
 	# Get the text from the LineEdit fields
 	var new_name = name_input.text
-	var new_details = details_input.text.split(",")
-	
+	# Split the details by commas and trim any whitespace from each item using `strip_edges`
+	var new_details = []
+	for detail in details_input.text.split(","):
+		new_details.append(detail.strip_edges())  # Trim spaces from both ends
+
 	# Refresh the UI with the new values
 	update_ui(new_name, new_details)
-	
-	# You can later implement additional functionality for saving the data, e.g., storing it persistently
+
+	# Prepare the data for PUT request
+	var json_data = {
+		"name": new_name,
+		"details": new_details
+	}
+	var json_string = JSON.stringify(json_data)
+
+	# Set up the headers for the PUT request
+	var headers = [
+		"accept: application/json",
+		"Content-Type: application/json"
+	]
+
+	var url = "http://127.0.0.1:8000/friends/%s" % str(friend_id)  # Using string interpolation
+
+
+	var err = http_request.request(
+		url,                     # The URL to send the request to
+		headers,                 # The request headers
+		HTTPClient.METHOD_PUT,   # HTTP PUT method
+		json_string              # The request body (JSON data)
+	)
+
+	if err != OK:
+		print("Error sending PUT request: ", err)
+
+# Handle the response from the HTTP PUT request
+func _on_request_completed(result, response_code, headers, body):
+	print("Request completed with code: ", response_code)
+
+	if response_code != 200:
+		print("Failed to save data")
+		return
+
+	# Optionally handle response data here
+	var json_result = body.get_string_from_utf8()
+	var json_parser = JSON.new()
+	var parse_result = json_parser.parse(json_result)
+
+	if parse_result != OK:
+		print("Error parsing JSON. Error code: ", parse_result)
+		return
+
+	var data = json_parser.data  # Get the resulting dictionary
+	print("Server response: ", data)
