@@ -40,7 +40,7 @@ class FriendTable(Base):
     details = Column(ARRAY(String))
 
     embeddings = relationship(
-        "ImageEmbedding", back_populates="friend", cascade="all, delete-orphan"
+        "EmbeddingTable", back_populates="friend", cascade="all, delete-orphan"
     )
 
 
@@ -54,9 +54,9 @@ class FriendModel(BaseModel):
         orm_mode = True
 
 
-# Define ImageEmbedding table (stores embeddings)
-class ImageEmbedding(Base):
-    __tablename__ = "image_embedding"
+# Define EmbeddingTable table (stores embeddings)
+class EmbeddingTable(Base):
+    __tablename__ = "embedding_table"
 
     embedding_id = Column(Integer, primary_key=True)
     friend_id = Column(Integer, ForeignKey("friend.id", ondelete="CASCADE"))
@@ -111,7 +111,7 @@ class FriendService:
             session.commit()  # Commit to get friend.id
 
             for embedding in embeddings:
-                friend_embedding = ImageEmbedding(
+                friend_embedding = EmbeddingTable(
                     friend_id=friend.id, embedding=embedding
                 )
                 session.add(friend_embedding)
@@ -175,7 +175,22 @@ class FriendService:
 
             return FriendModel(id=friend.id, name=friend.name, details=friend.details)
 
-    def get_friend_by_embeddings(self, embeddings: list[list[float]]):
-        """Get a friend by embeddings."""
-        # TODO: Implement similarity search based on embeddings
-        return {"message": "Not implemented yet."}
+    def get_friend_by_embeddings(self, embeddings: list[float]):
+        """Get a friend by embeddings using PostgreSQL's pgvector extension for similarity search."""
+        with get_session() as session:
+            # Perform similarity search using the built-in PostgreSQL 'vector <->' operator for Euclidean distance
+            closest_friend_embedding = (
+                session.query(EmbeddingTable)
+                .order_by(EmbeddingTable.embedding.l2_distance(embeddings))
+                .first()
+            )
+
+            if closest_friend_embedding:
+                closest_friend = closest_friend_embedding.friend
+                return FriendModel(
+                    id=closest_friend.id,
+                    name=closest_friend.name,
+                    details=closest_friend.details,
+                )
+            else:
+                return None
