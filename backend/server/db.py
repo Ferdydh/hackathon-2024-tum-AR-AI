@@ -88,33 +88,51 @@ class FriendService:
         friends_data = [
             {"name": "Alice", "details": ["vegan", "likes hiking"]},
             {"name": "Bob", "details": ["vegetarian", "enjoys reading"]},
-        ]
-        embeddings_data = [
-            [
-                [random.random() for _ in range(128)] for _ in range(2)
-            ],  # Alice embeddings
-            [[random.random() for _ in range(128)] for _ in range(2)],  # Bob embeddings
+            {"name": "Charlie", "details": ["loves cooking", "avid cyclist"]},
+            {"name": "David", "details": ["tech enthusiast", "gamer"]},
+            {"name": "Eve", "details": ["animal lover", "enjoys painting"]},
+            {"name": "Frank", "details": ["plays guitar", "coffee lover"]},
+            {"name": "Grace", "details": ["yoga practitioner", "minimalist"]},
+            {"name": "Hank", "details": ["fishing enthusiast", "history buff"]},
+            {"name": "Ivy", "details": ["fashion-forward", "dances ballet"]},
+            {"name": "Jack", "details": ["mountain climber", "photography enthusiast"]},
+            {"name": "Karen", "details": ["gardener", "loves puzzles"]},
+            {"name": "Leo", "details": ["movie buff", "soccer player"]},
+            {"name": "Mona", "details": ["traveler", "meditation practitioner"]},
+            {"name": "Nate", "details": ["coding geek", "enjoys chess"]},
+            {"name": "Olivia", "details": ["loves baking", "knits scarves"]},
+            {"name": "Paul", "details": ["bird watcher", "enthusiastic reader"]},
+            {"name": "Quincy", "details": ["runner", "podcast enthusiast"]},
+            {"name": "Rachel", "details": ["dog trainer", "fan of musicals"]},
+            {"name": "Sam", "details": ["collects comics", "frequent traveler"]},
+            {"name": "Tina", "details": ["fitness enthusiast", "plays piano"]},
+            {"name": "Uma", "details": ["pottery maker", "art history fan"]},
+            {"name": "Victor", "details": ["martial artist", "video editor"]},
+            {
+                "name": "Wendy",
+                "details": ["board game player", "science fiction lover"],
+            },
+            {"name": "Xander", "details": ["DJ", "thrill-seeker"]},
+            {"name": "Yara", "details": ["runs marathons", "tea lover"]},
+            {"name": "Zack", "details": ["car enthusiast", "gardening hobbyist"]},
         ]
 
         for i, friend_data in enumerate(friends_data):
             self.add_new_friend(
-                friend_data["name"], friend_data["details"], embeddings_data[i]
+                friend_data["name"],
+                friend_data["details"],
+                [random.random() for _ in range(128)],
             )
 
-    def add_new_friend(
-        self, name: str, details: list[str], embeddings: list[list[float]]
-    ):
+    def add_new_friend(self, name: str, details: list[str], embedding: list[float]):
         """Add a new friend along with their embeddings."""
         with get_session() as session:
             friend = FriendTable(name=name, details=details)
             session.add(friend)
             session.commit()  # Commit to get friend.id
 
-            for embedding in embeddings:
-                friend_embedding = EmbeddingTable(
-                    friend_id=friend.id, embedding=embedding
-                )
-                session.add(friend_embedding)
+            friend_embedding = EmbeddingTable(friend_id=friend.id, embedding=embedding)
+            session.add(friend_embedding)
 
             session.commit()
             return friend.id
