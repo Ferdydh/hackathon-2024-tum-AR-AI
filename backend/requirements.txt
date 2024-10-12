@@ -6,3 +6,6 @@ tensorflow
 fastapi
 uvicorn
 python-multipart
+sqlalchemy
+pgvector
+psycopg2-binary

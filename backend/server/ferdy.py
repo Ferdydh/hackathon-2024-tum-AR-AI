@@ -57,6 +57,8 @@ async def create_new_friend(images: list[UploadFile] = File(...)):
     ]
     embeddings = [e for e in embeddings if e is not None]
 
+    print(len(embeddings[0]))
+
     if not embeddings:
         raise HTTPException(
             status_code=400, detail="No face detected in any of the images"
@@ -71,7 +73,6 @@ async def create_new_friend(images: list[UploadFile] = File(...)):
         "details": [],
     }
 
-    print("New Friend:", friend_list[friend_id])
     return friend_list[friend_id]
 
 
