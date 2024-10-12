@@ -143,7 +143,13 @@ offset_bottom = 364.0
 [node name="NameLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
 layout_mode = 2
 
+[node name="NameInput" type="LineEdit" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+
 [node name="DetailsContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DetailsInput" type="LineEdit" parent="CanvasLayer/VBoxContainer"]
 layout_mode = 2
 
 [node name="EditButton" type="Button" parent="CanvasLayer/VBoxContainer"]

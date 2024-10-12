@@ -16,7 +16,7 @@ func _ready():
 	# Check if canvas_layer is valid (exists in the scene)
 	if canvas_layer:
 		# Set CanvasLayer visibility to false initially (if hidden by default)
-		canvas_layer.visible = false
+		#canvas_layer.visible = false
 		print("CanvasLayer found and hidden initially.")
 	else:
 		print("Error: CanvasLayer not found! Verify the node path.")
@@ -69,10 +69,10 @@ func send_screenshot():
 func _on_request_completed(result, response_code, headers, body):
 	print("Request completed with code: ", response_code)
 
-#	Comment out this code to see the screen
-	if response_code != 200:
-		print("No face")
-		return
+##	Comment out this code to see the screen
+	#if response_code != 200:
+		#print("No face")
+		#return
 
 	# Parse the body as JSON
 	var json_result = body.get_string_from_utf8()

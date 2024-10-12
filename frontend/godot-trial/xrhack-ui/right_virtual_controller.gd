@@ -16,7 +16,7 @@ func _ready():
 	# Check if canvas_layer is valid (exists in the scene)
 	if canvas_layer:
 		# Set CanvasLayer visibility to false initially (if hidden by default)
-		canvas_layer.visible = false
+		#canvas_layer.visible = false
 		print("CanvasLayer found and hidden initially.")
 	else:
 		print("Error: CanvasLayer not found! Verify the node path.")
