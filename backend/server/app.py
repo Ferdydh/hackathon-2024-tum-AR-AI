@@ -73,6 +73,35 @@ async def delete_friend(friend_id: int):
         raise HTTPException(status_code=404, detail="Friend not found")
 
 
+@app.post("/friends/search_by_image")
+async def search_friend_by_image(images: list[UploadFile] = File(...)):
+    # Ensure the files are valid images
+    for image in images:
+        if not image.content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail="Invalid image file")
+
+    images_task = [image.read() for image in images]
+    embeddings = [
+        extract_face_and_embedding(i) for i in (await asyncio.gather(*images_task))
+    ]
+    embeddings = [e for e in embeddings if e is not None]
+
+    if not embeddings:
+        raise HTTPException(
+            status_code=400, detail="No face detected in any of the images"
+        )
+
+    # Use only the first valid embedding for search
+    best_embedding = embeddings[0]
+
+    # Search for the closest friend by embedding
+    friend = friend_service.get_friend_by_embeddings(best_embedding)
+    if friend is None:
+        raise HTTPException(status_code=404, detail="No matching friend found")
+
+    return friend
+
+
 if __name__ == "__main__":
     import uvicorn
 

@@ -2,6 +2,9 @@
 
 > Just `docker compose up`
 
+open localhost:8000/docs for openapi viewer
+open localhost:8080 for db viewer
+
 ## Backend
 
 To run backend without docker:
