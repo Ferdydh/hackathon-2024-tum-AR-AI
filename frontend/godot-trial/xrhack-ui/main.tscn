@@ -154,8 +154,7 @@ layout_mode = 2
 
 [node name="EditButton" type="Button" parent="CanvasLayer/VBoxContainer"]
 layout_mode = 2
-text = "Test button"
-script = ExtResource("13_cosxk")
+text = "Edit"
 
 [node name="PhoneBook" type="CanvasLayer" parent="."]
 script = ExtResource("17_kfuch")
