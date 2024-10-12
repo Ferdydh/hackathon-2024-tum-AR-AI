@@ -175,13 +175,13 @@ class FriendService:
 
             return FriendModel(id=friend.id, name=friend.name, details=friend.details)
 
-    def get_friend_by_embeddings(self, embeddings: list[float]):
+    def get_friend_by_embedding(self, embedding: list[float]):
         """Get a friend by embeddings using PostgreSQL's pgvector extension for similarity search."""
         with get_session() as session:
             # Perform similarity search using the built-in PostgreSQL 'vector <->' operator for Euclidean distance
             closest_friend_embedding = (
                 session.query(EmbeddingTable)
-                .order_by(EmbeddingTable.embedding.l2_distance(embeddings))
+                .order_by(EmbeddingTable.embedding.l2_distance(embedding))
                 .first()
             )
 

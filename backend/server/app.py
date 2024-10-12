@@ -1,4 +1,3 @@
-import asyncio
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel
 
@@ -72,28 +71,18 @@ async def delete_friend(friend_id: int):
 
 
 @app.post("/friends/search_by_image")
-async def search_friend_by_image(images: list[UploadFile] = File(...)):
-    # Ensure the files are valid images
-    for image in images:
-        if not image.content_type.startswith("image/"):
-            raise HTTPException(status_code=400, detail="Invalid image file")
+async def search_friend_by_image(image: UploadFile = File(...)):
+    # Ensure the file is a valid image
 
-    images_task = [image.read() for image in images]
-    embeddings = [
-        extract_face_and_embedding(i) for i in (await asyncio.gather(*images_task))
-    ]
-    embeddings = [e for e in embeddings if e is not None]
+    if not image.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Invalid image file")
 
-    if not embeddings:
-        raise HTTPException(
-            status_code=400, detail="No face detected in any of the images"
-        )
-
-    # Use only the first valid embedding for search
-    best_embedding = embeddings[0]
+    embedding = extract_face_and_embedding(await image.read())
+    if embedding is None:
+        raise HTTPException(status_code=400, detail="No face detected in the image")
 
     # Search for the closest friend by embedding
-    friend = friend_service.get_friend_by_embeddings(best_embedding)
+    friend = friend_service.get_friend_by_embedding(embedding)
     if friend is None:
         raise HTTPException(status_code=404, detail="No matching friend found")
 
