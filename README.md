@@ -11,7 +11,9 @@ To run backend:
 
 To run frontend: `run`
 
-## To use database for the first time:
+## To open database viewer:
+
+> you only need this if you want to observe the db
 
 1. open `localhost:8080`
 2. login with username: `admin@admin.com` and password: `admin`

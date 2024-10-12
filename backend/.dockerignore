@@ -1,0 +1,9 @@
+# Ignore the virtual environment directory
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env
+*.ipynb

@@ -2,6 +2,15 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, ARRAY
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 from pgvector.sqlalchemy import Vector
 import random
+import os
+
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_USER = os.getenv("DB_USER", "hackathon_user")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "hackathon_password")
+DB_NAME = os.getenv("DB_NAME", "hackathon_db")
+
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+
 
 # Define the base for our models
 Base = declarative_base()
@@ -31,14 +40,8 @@ class ImageEmbedding(Base):
     friend = relationship("Friend", back_populates="embeddings")
 
 
-# We could move this to env but for simplicity we'll keep it here
-db_name = "hackathon_db"
-db_user = "hackathon_user"
-db_password = "hackathon_password"
-
-
 # Create database engine and session
-engine = create_engine(f"postgresql://{db_user}:{db_password}@localhost/{db_name}")
+engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 session = Session()
 

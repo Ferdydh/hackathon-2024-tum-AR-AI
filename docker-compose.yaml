@@ -30,6 +30,25 @@ services:
     networks:
       - hackathon-net
 
+  fastapi:
+    build:
+      context: ./backend  # Path to your FastAPI app directory
+    container_name: fastapi_app
+    environment:
+      - DB_HOST=db
+      - DB_USER=hackathon_user
+      - DB_PASSWORD=hackathon_password
+      - DB_NAME=hackathon_db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app  # Map the backend directory into the container
+    depends_on:
+      - db
+    networks:
+      - hackathon-net
+    command: uvicorn server.app:app --host 0.0.0.0 --port 8000 --reload
+
 networks:
   hackathon-net:
     driver: bridge
