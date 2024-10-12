@@ -54,9 +54,6 @@ script = ExtResource("8_ibq41")
 actions = Array[ExtResource("7_ofmb8")]([SubResource("Resource_ts875")])
 
 [sub_resource type="GDScript" id="GDScript_xqedw"]
-script/source = "extends Button
-
-"
 
 [node name="Main" type="Node3D"]
 

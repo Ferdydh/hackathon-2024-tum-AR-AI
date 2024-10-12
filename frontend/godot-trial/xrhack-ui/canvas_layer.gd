@@ -1,9 +1,5 @@
 extends CanvasLayer
 
-# Declare the variables with initial values
-var friend_name : String = "Default Name"
-var friend_detail_list : Array = ["Detail 1", "Detail 2"]
-
 # Reference nodes using @onready keyword
 @onready var name_label = $VBoxContainer/NameLabel
 @onready var details_container = $VBoxContainer/DetailsContainer
@@ -12,13 +8,13 @@ var friend_detail_list : Array = ["Detail 1", "Detail 2"]
 # Called when the node enters the scene tree
 func _ready():
 	# Update the UI initially
-	update_ui()
+	update_ui("Default Name", ["Detail 1", "Detail 2"])
 	
 	# Connect the button to the edit function
 	edit_button.pressed.connect(_on_edit_button_pressed)
 
 # Function to update the UI dynamically
-func update_ui():
+func update_ui(friend_name: String, friend_detail_list: Array):
 	# Update the name label
 	name_label.text = "Name: %s" % friend_name
 	
@@ -34,6 +30,4 @@ func update_ui():
 
 # Button press function to modify name and details
 func _on_edit_button_pressed():
-	friend_name = "test"
-	friend_detail_list = ["hi", "test2"]
-	update_ui()  # Refresh the UI
+	update_ui("test", ["hi", "test2"])  # Refresh the UI
