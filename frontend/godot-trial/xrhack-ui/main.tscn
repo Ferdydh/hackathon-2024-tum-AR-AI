@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://6bqgl85fumoy"]
+[gd_scene load_steps=26 format=3 uid="uid://d1xbj7b25s75d"]
 
 [ext_resource type="PackedScene" uid="uid://cjcehqrfoxav3" path="res://addons/hand_pose_detector/hands/LeftHandHumanoid.gltf" id="1_et1gj"]
 [ext_resource type="PackedScene" uid="uid://df5hynbooj1uj" path="res://addons/hand_pose_detector/hand_pose_detector.tscn" id="2_88ii3"]
@@ -14,7 +14,6 @@
 [ext_resource type="PackedScene" uid="uid://clc5dre31iskm" path="res://addons/godot-xr-tools/xr/start_xr.tscn" id="11_jx62r"]
 [ext_resource type="PackedScene" uid="uid://camrqshwwsrab" path="res://block.tscn" id="11_u5muy"]
 [ext_resource type="Script" path="res://right_virtual_controller.gd" id="12_jh75a"]
-[ext_resource type="Script" path="res://button.gd" id="13_cosxk"]
 [ext_resource type="Script" path="res://canvas_layer.gd" id="15_2mk87"]
 [ext_resource type="Script" path="res://phonebook.gd" id="17_kfuch"]
 
