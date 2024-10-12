@@ -4,9 +4,10 @@ FROM python:3.12-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies for OpenGL and other required libraries
-RUN apt-get update && apt-get install -y \
+# Install system dependencies for OpenGL, glib, and other required libraries
+RUN apt-get install -y \
   libgl1 \
+  libglib2.0-0 \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy the current directory contents into the container at /app

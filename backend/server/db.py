@@ -1,8 +1,11 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, ARRAY
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 from pgvector.sqlalchemy import Vector
 import random
 import os
+from pydantic import BaseModel
+from contextlib import contextmanager
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_USER = os.getenv("DB_USER", "hackathon_user")
@@ -11,13 +14,25 @@ DB_NAME = os.getenv("DB_NAME", "hackathon_db")
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
 
-
 # Define the base for our models
 Base = declarative_base()
 
 
+@contextmanager
+def get_session():
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+
 # Define Friend table (stores friend details)
-class Friend(Base):
+class FriendTable(Base):
     __tablename__ = "friend"
 
     id = Column(Integer, primary_key=True)
@@ -29,85 +44,138 @@ class Friend(Base):
     )
 
 
+# Pydantic
+class FriendModel(BaseModel):
+    id: int
+    name: str
+    details: list[str]
+
+    class Config:
+        orm_mode = True
+
+
 # Define ImageEmbedding table (stores embeddings)
 class ImageEmbedding(Base):
     __tablename__ = "image_embedding"
 
     embedding_id = Column(Integer, primary_key=True)
     friend_id = Column(Integer, ForeignKey("friend.id", ondelete="CASCADE"))
-    embedding = Column(Vector(128))  # Assuming embeddings are 3-dimensional
+    embedding = Column(Vector(128))  # Assuming embeddings are 128-dimensional
 
-    friend = relationship("Friend", back_populates="embeddings")
+    friend = relationship("FriendTable", back_populates="embeddings")
 
 
 # Create database engine and session
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
-session = Session()
 
 
-def create_tables_if_not_exist():
-    # Check if tables exist and create if not
-    Base.metadata.create_all(engine)
-
-    # Check if tables are empty and populate with random data if necessary
-    if session.query(Friend).count() == 0:
-        populate_random_data()
+class FriendNotFoundError(Exception):
+    pass
 
 
-def populate_random_data():
-    friends_data = [
-        {"name": "Alice", "details": ["vegan", "likes hiking"]},
-        {"name": "Bob", "details": ["vegetarian", "enjoys reading"]},
-    ]
-    embeddings_data = [
-        [
-            [random.random() for _ in range(128)] for _ in range(2)
-        ],  # 2 random embeddings for Alice
-        [
-            [random.random() for _ in range(128)] for _ in range(2)
-        ],  # 2 random embeddings for Bob
-    ]
+class FriendService:
+    def create_tables_if_not_exist(self):
+        """Creates tables if they do not exist and populates with random data if necessary."""
+        Base.metadata.create_all(engine)
 
-    for i, friend_data in enumerate(friends_data):
-        add_new_friend(friend_data["name"], friend_data["details"], embeddings_data[i])
+        with get_session() as session:
+            if session.query(FriendTable).count() == 0:
+                self.populate_random_data()
 
+    def populate_random_data(self):
+        """Populate the database with random data."""
+        friends_data = [
+            {"name": "Alice", "details": ["vegan", "likes hiking"]},
+            {"name": "Bob", "details": ["vegetarian", "enjoys reading"]},
+        ]
+        embeddings_data = [
+            [
+                [random.random() for _ in range(128)] for _ in range(2)
+            ],  # Alice embeddings
+            [[random.random() for _ in range(128)] for _ in range(2)],  # Bob embeddings
+        ]
 
-def add_new_friend(name: str, details: list[str], embeddings: list[list[float]]):
-    friend = Friend(name=name, details=details)
-    session.add(friend)
-    session.commit()  # Commit to get friend.id
+        for i, friend_data in enumerate(friends_data):
+            self.add_new_friend(
+                friend_data["name"], friend_data["details"], embeddings_data[i]
+            )
 
-    for embedding in embeddings:
-        friend_embedding = ImageEmbedding(friend_id=friend.id, embedding=embedding)
-        session.add(friend_embedding)
+    def add_new_friend(
+        self, name: str, details: list[str], embeddings: list[list[float]]
+    ):
+        """Add a new friend along with their embeddings."""
+        with get_session() as session:
+            friend = FriendTable(name=name, details=details)
+            session.add(friend)
+            session.commit()  # Commit to get friend.id
 
-    session.commit()
-    print(f"Added new friend {name} with embeddings")
-    return friend.id
+            for embedding in embeddings:
+                friend_embedding = ImageEmbedding(
+                    friend_id=friend.id, embedding=embedding
+                )
+                session.add(friend_embedding)
 
+            session.commit()
+            return friend.id
 
-def edit_friend(friend_id, new_name: str = None, new_details: list[str] = None):
-    friend = session.query(Friend).filter(Friend.id == friend_id).first()
-    if not friend:
-        print(f"Friend with ID {friend_id} not found.")
-        return
+    def edit_friend(
+        self,
+        friend_id: int,
+        new_name: str | None,
+        new_details: list[str] | None,
+    ):
+        """Edit friend details."""
+        with get_session() as session:
+            friend = (
+                session.query(FriendTable).filter(FriendTable.id == friend_id).first()
+            )
+            if not friend:
+                raise FriendNotFoundError()
 
-    if new_name:
-        friend.name = new_name
-    if new_details:
-        friend.details = new_details
+            if new_name:
+                friend.name = new_name
+            if new_details:
+                friend.details = new_details
 
-    session.commit()
-    print(f"Friend {friend_id} has been updated.")
+            session.commit()
+            return friend_id
 
+    def delete_friend(self, friend_id: int) -> bool:
+        """Delete a friend by ID."""
+        with get_session() as session:
+            friend = (
+                session.query(FriendTable).filter(FriendTable.id == friend_id).first()
+            )
+            if not friend:
+                raise FriendNotFoundError()
 
-def delete_friend(friend_id):
-    friend = session.query(Friend).filter(Friend.id == friend_id).first()
-    if not friend:
-        print(f"Friend with ID {friend_id} not found.")
-        return
+            session.delete(friend)
+            session.commit()
+            return True
 
-    session.delete(friend)
-    session.commit()
-    print(f"Friend {friend_id} and their embeddings have been deleted.")
+    def get_all_friends(self):
+        """Get a list of all friends and their embeddings."""
+        with get_session() as session:
+            friends = session.query(FriendTable).all()
+
+            return [
+                FriendModel(id=friend.id, name=friend.name, details=friend.details)
+                for friend in friends
+            ]
+
+    def get_friend_by_id(self, friend_id: int) -> FriendModel | None:
+        """Get a friend by ID."""
+        with get_session() as session:
+            friend = (
+                session.query(FriendTable).filter(FriendTable.id == friend_id).first()
+            )
+            if not friend:
+                return None
+
+            return FriendModel(id=friend.id, name=friend.name, details=friend.details)
+
+    def get_friend_by_embeddings(self, embeddings: list[list[float]]):
+        """Get a friend by embeddings."""
+        # TODO: Implement similarity search based on embeddings
+        return {"message": "Not implemented yet."}

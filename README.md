@@ -1,11 +1,14 @@
 # How to run
 
+> Just `docker compose up`
+
 ## Backend
 
-To run backend:
+To run backend without docker:
 
-1. `pip install -r backend/requirements.txt`
-2. `uvicorn backend.server.app:app --reload`
+1. `python -m venv .venv`
+2. `pip install -r backend/requirements.txt`
+3. `uvicorn backend.server.app:app --reload`
 
 ## Frontend (Unity)
 
