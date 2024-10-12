@@ -15,28 +15,26 @@ def get_all_friends():
     return friend_service.get_all_friends()
 
 
-# FastAPI route to accept images
 @app.post("/friends/")
-async def create_new_friend(images: list[UploadFile] = File(...)):
-    # Ensure files are valid images
-    for image in images:
-        if not image.content_type.startswith("image/"):
-            raise HTTPException(status_code=400, detail="Invalid image file")
+async def create_new_friend(image: UploadFile = File(...)):
+    # Ensure the file is a valid image
+    if not image.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Invalid image file")
 
-    images_task = [image.read() for image in images]
-    embeddings = [
-        extract_face_and_embedding(i) for i in (await asyncio.gather(*images_task))
-    ]
-    embeddings = [e for e in embeddings if e is not None]
+    # Read the image file
+    image_data = await image.read()
 
-    if not embeddings:
-        raise HTTPException(
-            status_code=400, detail="No face detected in any of the images"
-        )
+    # Extract the face and embeddings
+    embedding = extract_face_and_embedding(image_data)
 
-    # save to friend_list
-    id = friend_service.add_new_friend("New Friend", [], embeddings)
+    # If no face is detected, raise an exception
+    if embedding is None:
+        raise HTTPException(status_code=400, detail="No face detected in the image")
 
+    # Save to friend_list
+    id = friend_service.add_new_friend("New Friend", [], [embedding])
+
+    # Return the newly added friend
     return friend_service.get_friend_by_id(id)
 
 
