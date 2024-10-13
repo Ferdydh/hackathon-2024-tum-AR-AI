@@ -48,7 +48,6 @@ const CameraWindow = () => {
     mutateAsync(imgBlob).then((data) => {
       if (data.detail === "No matching friend found") {
         setFriendNotFound(true);
-        console.log("fuck");
         return;
       }
       setFriend(data as Friend);
