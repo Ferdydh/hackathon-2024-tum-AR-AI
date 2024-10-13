@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=4 uid="uid://6bqgl85fumoy"]
+[gd_scene load_steps=19 format=4 uid="uid://6bqgl85fumoy"]
 
 [ext_resource type="Material" uid="uid://cdb40djkihelq" path="res://addons/godot-xr-tools/hands/materials/cleaning_glove.tres" id="2_nur1k"]
 [ext_resource type="PackedScene" uid="uid://cqhw276realc" path="res://addons/godot-xr-tools/functions/function_pointer.tscn" id="9_3t07t"]
@@ -9,8 +9,6 @@
 [ext_resource type="PackedScene" uid="uid://b5gr7s7cp02p2" path="res://detail_canvas.tscn" id="11_oel6n"]
 [ext_resource type="PackedScene" uid="uid://camrqshwwsrab" path="res://block.tscn" id="11_u5muy"]
 [ext_resource type="Script" path="res://right_virtual_controller.gd" id="12_jh75a"]
-[ext_resource type="Script" path="res://canvas_layer.gd" id="15_2mk87"]
-[ext_resource type="Script" path="res://phonebook.gd" id="17_kfuch"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_8m0uh"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -233,9 +231,6 @@ bind/25/name = &"Palm_R"
 bind/25/bone = -1
 bind/25/pose = Transform3D(1, 3.12371e-06, -3.13855e-06, -3.12364e-06, 1, 1.98203e-05, 3.13861e-06, -1.9828e-05, 1, 0.0307808, 0.0419728, 0.0399498)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yp4rq"]
-bg_color = Color(0.147672, 0.147672, 0.147672, 1)
-
 [node name="Main" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -291,56 +286,6 @@ visible = false
 
 [node name="StartXR" parent="." instance=ExtResource("11_jx62r")]
 
-[node name="DetailCanvas" type="CanvasLayer" parent="."]
-visible = false
-script = ExtResource("15_2mk87")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="DetailCanvas"]
-offset_left = 86.0
-offset_top = 58.0
-offset_right = 355.0
-offset_bottom = 364.0
-
-[node name="NameLabel" type="Label" parent="DetailCanvas/VBoxContainer"]
-layout_mode = 2
-
-[node name="NameInput" type="LineEdit" parent="DetailCanvas/VBoxContainer"]
-layout_mode = 2
-
-[node name="DetailsContainer" type="VBoxContainer" parent="DetailCanvas/VBoxContainer"]
-layout_mode = 2
-
-[node name="DetailsInput" type="LineEdit" parent="DetailCanvas/VBoxContainer"]
-layout_mode = 2
-
-[node name="EditButton" type="Button" parent="DetailCanvas/VBoxContainer"]
-layout_mode = 2
-text = "Edit"
-
-[node name="PhoneBook" type="CanvasLayer" parent="."]
-visible = false
-script = ExtResource("17_kfuch")
-
-[node name="ScrollContainer" type="ScrollContainer" parent="PhoneBook"]
-offset_left = 852.0
-offset_top = 79.0
-offset_right = 1058.0
-offset_bottom = 295.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_yp4rq")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="PhoneBook/ScrollContainer"]
-layout_mode = 2
-
-[node name="Button" type="Button" parent="PhoneBook"]
-offset_left = 852.0
-offset_top = 46.0
-offset_right = 936.0
-offset_bottom = 77.0
-action_mode = 0
-text = "Add Entry"
-
-[node name="HTTPRequest" type="HTTPRequest" parent="PhoneBook"]
-
 [node name="Timer" type="Timer" parent="."]
 wait_time = 5.0
 
@@ -360,5 +305,3 @@ scene = ExtResource("11_oel6n")
 transparent = 0
 unshaded = true
 scene_properties_keys = PackedStringArray("canvas_layer.gd")
-
-[connection signal="timeout" from="Timer" to="PhoneBook" method="_on_timer_timeout"]
