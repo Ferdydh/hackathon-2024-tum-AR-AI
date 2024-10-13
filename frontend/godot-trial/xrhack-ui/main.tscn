@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=4 uid="uid://6bqgl85fumoy"]
+[gd_scene load_steps=22 format=4 uid="uid://6bqgl85fumoy"]
 
 [ext_resource type="Material" uid="uid://cdb40djkihelq" path="res://addons/godot-xr-tools/hands/materials/cleaning_glove.tres" id="2_nur1k"]
 [ext_resource type="PackedScene" uid="uid://cqhw276realc" path="res://addons/godot-xr-tools/functions/function_pointer.tscn" id="9_3t07t"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://left_virtual_controller.gd" id="10_et71k"]
 [ext_resource type="PackedScene" uid="uid://bnk6lgffir5ox" path="res://phone_book.tscn" id="10_o02lx"]
 [ext_resource type="PackedScene" uid="uid://clc5dre31iskm" path="res://addons/godot-xr-tools/xr/start_xr.tscn" id="11_jx62r"]
+[ext_resource type="PackedScene" uid="uid://b5gr7s7cp02p2" path="res://detail_canvas.tscn" id="11_oel6n"]
 [ext_resource type="PackedScene" uid="uid://camrqshwwsrab" path="res://block.tscn" id="11_u5muy"]
 [ext_resource type="Script" path="res://right_virtual_controller.gd" id="12_jh75a"]
 [ext_resource type="Script" path="res://canvas_layer.gd" id="15_2mk87"]
@@ -247,7 +248,7 @@ shadow_enabled = true
 [node name="XROrigin3D" type="XROrigin3D" parent="."]
 
 [node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.51834, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.06639e-07, 1.51854, -0.0293621)
 
 [node name="LeftVirtualController" type="XRController3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1, 0)
@@ -282,6 +283,7 @@ show_target = true
 
 [node name="Block" parent="Blocks" instance=ExtResource("11_u5muy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.165599, 1.3, -0.3)
+visible = false
 
 [node name="Block2" parent="Blocks" instance=ExtResource("11_u5muy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.195813, 1.08904, -0.3)
@@ -290,6 +292,7 @@ visible = false
 [node name="StartXR" parent="." instance=ExtResource("11_jx62r")]
 
 [node name="DetailCanvas" type="CanvasLayer" parent="."]
+visible = false
 script = ExtResource("15_2mk87")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="DetailCanvas"]
@@ -341,13 +344,21 @@ text = "Add Entry"
 [node name="Timer" type="Timer" parent="."]
 wait_time = 5.0
 
-[node name="Viewport2Din3D" parent="." instance=ExtResource("9_n4dig")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.248155, 1.15773, -0.422693)
+[node name="PhoneView" parent="." instance=ExtResource("9_n4dig")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.277067, 1.6, -0.72723)
 screen_size = Vector2(0.25, 0.3)
 scene = ExtResource("10_o02lx")
 viewport_size = Vector2(300, 250)
 transparent = 0
 unshaded = true
 scene_properties_keys = PackedStringArray("phonebook.gd")
+
+[node name="Viewport2Din3D" parent="." instance=ExtResource("9_n4dig")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.295321, 1.60384, -0.709422)
+screen_size = Vector2(0.25, 0.19)
+scene = ExtResource("11_oel6n")
+transparent = 0
+unshaded = true
+scene_properties_keys = PackedStringArray("canvas_layer.gd")
 
 [connection signal="timeout" from="Timer" to="PhoneBook" method="_on_timer_timeout"]

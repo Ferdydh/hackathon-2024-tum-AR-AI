@@ -46,16 +46,16 @@ func _on_request_completed(result: int, response_code: int, headers: PackedStrin
 	else:
 		print("Failed to fetch data. Response code: ", response_code)
 
-# TODO: update doesn't work, jadi duplicate because of ID increment.
+
 func _on_friend_button_pressed(friend_data: Dictionary) -> void:
+	# Call the update_ui method of the CanvasLayer to update the display
+	canvas_layer.update_ui(friend_data["name"], friend_data["details"])
+	print("You clicked on: " + friend_data["name"])
+	print("Details: " + str(friend_data["details"]))
+	
+# TODO: update doesn't work, jadi duplicate because of ID increment.
+func _on_timer_timeout() -> void:
 	for child in container.get_children():
 		child.queue_free()
 	print('load friends')
 	load_friends()
-
-
-#func _on_timer_timeout() -> void:
-#	for child in container.get_children():
-#		child.queue_free()
-#	print('load friends')
-#	load_friends()
