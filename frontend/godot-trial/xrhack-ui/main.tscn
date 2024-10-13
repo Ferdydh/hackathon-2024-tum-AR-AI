@@ -315,6 +315,7 @@ layout_mode = 2
 text = "Edit"
 
 [node name="PhoneBook" type="CanvasLayer" parent="."]
+visible = false
 script = ExtResource("17_kfuch")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="PhoneBook"]
@@ -342,8 +343,11 @@ wait_time = 5.0
 
 [node name="Viewport2Din3D" parent="." instance=ExtResource("9_n4dig")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.248155, 1.15773, -0.422693)
-screen_size = Vector2(0.2, 0.3)
+screen_size = Vector2(0.25, 0.3)
 scene = ExtResource("10_o02lx")
+viewport_size = Vector2(300, 250)
+transparent = 0
+unshaded = true
 scene_properties_keys = PackedStringArray("phonebook.gd")
 
 [connection signal="timeout" from="Timer" to="PhoneBook" method="_on_timer_timeout"]
