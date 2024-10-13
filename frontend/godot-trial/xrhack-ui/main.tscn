@@ -8,7 +8,6 @@
 [ext_resource type="PackedScene" uid="uid://bh8isvqs258cp" path="res://addons/hand_pose_detector/hand_pose_controller.tscn" id="6_ri3xl"]
 [ext_resource type="Script" path="res://addons/hand_pose_detector/hand_pose_action.gd" id="7_ofmb8"]
 [ext_resource type="Script" path="res://addons/hand_pose_detector/hand_pose_action_map.gd" id="8_ibq41"]
-[ext_resource type="PackedScene" uid="uid://cqhw276realc" path="res://addons/godot-xr-tools/functions/function_pointer.tscn" id="9_3t07t"]
 [ext_resource type="PackedScene" uid="uid://dabmoo0spa6vg" path="res://addons/hand_pose_detector/hands/RightHandHumanoid.gltf" id="9_6kkxq"]
 [ext_resource type="Script" path="res://left_virtual_controller.gd" id="10_et71k"]
 [ext_resource type="PackedScene" uid="uid://clc5dre31iskm" path="res://addons/godot-xr-tools/xr/start_xr.tscn" id="11_jx62r"]
@@ -54,6 +53,9 @@ poses = Array[ExtResource("3_phyhv")]([ExtResource("4_dxbsk")])
 script = ExtResource("8_ibq41")
 actions = Array[ExtResource("7_ofmb8")]([SubResource("Resource_ts875")])
 
+[sub_resource type="BoxMesh" id="BoxMesh_kc3fq"]
+size = Vector3(0.1, 0.1, 0.1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yp4rq"]
 bg_color = Color(0.147672, 0.147672, 0.147672, 1)
 
@@ -73,6 +75,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.51834, 0)
 
 [node name="LeftTrackHand" type="XRNode3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1, 0)
+visible = false
 tracker = &"left_hand"
 
 [node name="LeftHandHumanoid2" parent="XROrigin3D/LeftTrackHand" instance=ExtResource("1_et1gj")]
@@ -85,13 +88,9 @@ hand_pose_set = SubResource("Resource_vfpp6")
 [node name="HandPoseController" parent="XROrigin3D/LeftTrackHand/HandPoseDetector" instance=ExtResource("6_ri3xl")]
 controller_action_map = SubResource("Resource_2hmu8")
 
-[node name="FunctionPointer" parent="XROrigin3D/LeftTrackHand" instance=ExtResource("9_3t07t")]
-show_laser = 2
-laser_length = 1
-show_target = true
-
 [node name="RightTrackHand" type="XRNode3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1, 0)
+visible = false
 tracker = &"right_hand"
 
 [node name="RightHandHumanoid2" parent="XROrigin3D/RightTrackHand" instance=ExtResource("9_6kkxq")]
@@ -107,20 +106,21 @@ hand_pose_set = SubResource("Resource_eibak")
 controller_tracker_name = "/user/hand_pose_controller/right"
 controller_action_map = SubResource("Resource_xlb2k")
 
-[node name="FunctionPointer" parent="XROrigin3D/RightTrackHand" instance=ExtResource("9_3t07t")]
-show_laser = 2
-laser_length = 1
-show_target = true
-
 [node name="LeftVirtualController" type="XRController3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1, 0)
-tracker = &"/user/hand_pose_controller/left"
+tracker = &"left_hand"
 script = ExtResource("10_et71k")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/LeftVirtualController"]
+mesh = SubResource("BoxMesh_kc3fq")
 
 [node name="RightVirtualController" type="XRController3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1, 0)
-tracker = &"/user/hand_pose_controller/right"
+tracker = &"right_hand"
 script = ExtResource("12_jh75a")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/RightVirtualController"]
+mesh = SubResource("BoxMesh_kc3fq")
 
 [node name="Blocks" type="Node3D" parent="."]
 
