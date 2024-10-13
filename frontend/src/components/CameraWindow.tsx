@@ -1,4 +1,9 @@
-import { Friend, useGetFriends, useSearchFriendByImage } from "@/api/api";
+import {
+  Friend,
+  useCreateFriend,
+  useGetFriends,
+  useSearchFriendByImage,
+} from "@/api/api";
 import { cn, dataURItoBlob } from "@/lib/utils";
 import { CameraIcon } from "@radix-ui/react-icons";
 import { useRef, useState } from "react";
@@ -27,20 +32,36 @@ const videoConstraints = {
 
 const CameraWindow = () => {
   const [image, setImage] = useState<string>();
-  const [friend, setFriend] = useState<Friend>();
+  const [friend, setFriend] = useState<Friend | undefined>();
+  const [friendNotFound, setFriendNotFound] = useState(false);
   const [toggleList, setToggleList] = useState(false);
   const { friends } = useGetFriends();
   const webcamRef = useRef({} as Webcam);
-  const { mutateAsync, error } = useSearchFriendByImage();
+  const { mutateAsync, isError } = useSearchFriendByImage();
+  const { mutateAsync: addFriend } = useCreateFriend();
 
   const capture = () => {
     const imageString = webcamRef.current.getScreenshot() as string;
     setImage(imageString);
-    console.log(imageString);
     // convert image string to file
     const imgBlob = dataURItoBlob(imageString);
     mutateAsync(imgBlob).then((data) => {
+      if (data.detail === "No matching friend found") {
+        setFriendNotFound(true);
+        console.log("fuck");
+        return;
+      }
+      setFriend(data as Friend);
+    });
+  };
+
+  const handleAddFriend = () => {
+    const imageString = webcamRef.current.getScreenshot() as string;
+    setImage(imageString);
+    const imgBlob = dataURItoBlob(imageString);
+    addFriend(imgBlob).then((data) => {
       setFriend(data);
+      setFriendNotFound(false);
     });
   };
 
@@ -54,8 +75,14 @@ const CameraWindow = () => {
         videoConstraints={videoConstraints}
       />
       <div className="absolute left-0 top-1/4 pl-4">
-        {error && <div className="text-red-500">{error.message}</div>}
-        {friend && !error && (
+        {isError ||
+          (friendNotFound && (
+            <div className="text-red-500">
+              <p>Failed to find friend</p>
+              <Button onClick={() => handleAddFriend()}>Add friend</Button>
+            </div>
+          ))}
+        {friend && !isError && (
           <FriendCard
             friend={friend}
             setFriend={setFriend}
@@ -66,31 +93,32 @@ const CameraWindow = () => {
           />
         )}
       </div>
-      <div className="absolute right-0 top-0 flex flex-col pr-10">
-        <Button
-          onClick={() => setToggleList(!toggleList)}
-          className="mt-10 py-4"
-        >
-          {toggleList ? "Hide" : "Show"} List
-        </Button>
+      <div className="absolute right-0 top-1/2 flex flex-col pr-10">
         {toggleList && (
           <div className="overflow-y-auto max-h-[44rem] space-y-4 mb-4">
-            {friends &&
-              friends.length > 0 &&
-              friends.map((friend: Friend) => (
-                <FriendCard
-                  key={friend.id}
-                  friend={friend}
-                  setFriend={setFriend}
-                />
-              ))}
+            {friends && (
+              <>
+                <Button
+                  onClick={() => setToggleList(!toggleList)}
+                  className="mt-10 py-4"
+                >
+                  {toggleList ? "Hide" : "Show"} List
+                </Button>
+                {toggleList &&
+                  friends.length > 0 &&
+                  friends.map((friend: Friend) => (
+                    <FriendCard
+                      key={friend.id}
+                      friend={friend}
+                      setFriend={setFriend}
+                    />
+                  ))}
+              </>
+            )}
           </div>
         )}
         <Button onClick={capture}>
           <CameraIcon className="size-6" />
-        </Button>
-        <Button variant="destructive" onClick={() => setImage("")}>
-          Clear photo
         </Button>
       </div>
 

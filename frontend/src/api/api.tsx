@@ -45,7 +45,8 @@ export type Friend = {
 };
 
 export const useCreateFriend = () => {
-  const createFriend = async ({ image }: Friend) => {
+  const queryClient = useQueryClient();
+  const createFriend = async (image: Blob) => {
     const formData = new FormData();
     if (image) {
       formData.append("image", image);
@@ -60,6 +61,28 @@ export const useCreateFriend = () => {
 
   return useMutation({
     mutationFn: createFriend,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["friends"],
+      });
+    },
+  });
+};
+
+export const useSearchFriendByImage = () => {
+  const searchFriendByImage = async (image: Blob) => {
+    const formData = new FormData();
+    formData.append(`image`, image);
+
+    const response = await fetch(`${API_URL}/friends/search_by_image`, {
+      method: "POST",
+      body: formData,
+    });
+    return response.json();
+  };
+
+  return useMutation({
+    mutationFn: searchFriendByImage,
   });
 };
 
@@ -113,22 +136,5 @@ export const useDeleteFriend = () => {
   };
   return useMutation({
     mutationFn: deleteFriend,
-  });
-};
-
-export const useSearchFriendByImage = () => {
-  const searchFriendByImage = async (image: Blob) => {
-    const formData = new FormData();
-    formData.append(`image`, image);
-
-    const response = await fetch(`${API_URL}/friends/search_by_image`, {
-      method: "POST",
-      body: formData,
-    });
-    return response.json();
-  };
-
-  return useMutation({
-    mutationFn: searchFriendByImage,
   });
 };

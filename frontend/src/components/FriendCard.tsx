@@ -7,15 +7,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Cross1Icon } from "@radix-ui/react-icons";
+import { TrashIcon } from "lucide-react";
+import { SetStateAction } from "react";
 import EditFriendDialog from "./EditFriendDialog";
 import { Button } from "./ui/button";
 import { Chip } from "./ui/chip";
-import { XIcon } from "lucide-react";
 
 type FriendCardProps = {
   friend: Friend;
   onRemove?: () => void;
-  setFriend: (friend: Friend) => void;
+  setFriend: (value: SetStateAction<Friend | undefined>) => void;
 };
 
 const FriendCard = ({ friend, onRemove, setFriend }: FriendCardProps) => {
@@ -23,7 +24,7 @@ const FriendCard = ({ friend, onRemove, setFriend }: FriendCardProps) => {
   const { mutateAsync } = useDeleteFriend();
 
   const handleRemove = () => {
-    setFriend({});
+    if (onRemove) onRemove();
     mutateAsync(friend?.id || "");
   };
 
@@ -50,9 +51,9 @@ const FriendCard = ({ friend, onRemove, setFriend }: FriendCardProps) => {
             </Chip>
           ))}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="space-x-4">
         <Button variant="destructive" onClick={handleRemove}>
-          <XIcon className="size-4" />
+          <TrashIcon className="size-4" />
         </Button>
         <EditFriendDialog friend={friend} setFriend={setFriend} />
       </CardFooter>
