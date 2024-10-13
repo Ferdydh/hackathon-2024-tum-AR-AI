@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://6bqgl85fumoy"]
+[gd_scene load_steps=26 format=3 uid="uid://6bqgl85fumoy"]
 
 [ext_resource type="PackedScene" uid="uid://cjcehqrfoxav3" path="res://addons/hand_pose_detector/hands/LeftHandHumanoid.gltf" id="1_et1gj"]
 [ext_resource type="PackedScene" uid="uid://df5hynbooj1uj" path="res://addons/hand_pose_detector/hand_pose_detector.tscn" id="2_88ii3"]
@@ -8,13 +8,12 @@
 [ext_resource type="PackedScene" uid="uid://bh8isvqs258cp" path="res://addons/hand_pose_detector/hand_pose_controller.tscn" id="6_ri3xl"]
 [ext_resource type="Script" path="res://addons/hand_pose_detector/hand_pose_action.gd" id="7_ofmb8"]
 [ext_resource type="Script" path="res://addons/hand_pose_detector/hand_pose_action_map.gd" id="8_ibq41"]
+[ext_resource type="PackedScene" uid="uid://cqhw276realc" path="res://addons/godot-xr-tools/functions/function_pointer.tscn" id="9_3t07t"]
 [ext_resource type="PackedScene" uid="uid://dabmoo0spa6vg" path="res://addons/hand_pose_detector/hands/RightHandHumanoid.gltf" id="9_6kkxq"]
 [ext_resource type="Script" path="res://left_virtual_controller.gd" id="10_et71k"]
 [ext_resource type="PackedScene" uid="uid://clc5dre31iskm" path="res://addons/godot-xr-tools/xr/start_xr.tscn" id="11_jx62r"]
 [ext_resource type="PackedScene" uid="uid://camrqshwwsrab" path="res://block.tscn" id="11_u5muy"]
-[ext_resource type="PackedScene" uid="uid://b4kad2kuba1yn" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/left_hand_low.tscn" id="11_uflga"]
 [ext_resource type="Script" path="res://right_virtual_controller.gd" id="12_jh75a"]
-[ext_resource type="PackedScene" uid="uid://l2n30mpbkdyw" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/right_hand_low.tscn" id="13_hlha2"]
 [ext_resource type="Script" path="res://canvas_layer.gd" id="15_2mk87"]
 [ext_resource type="Script" path="res://phonebook.gd" id="17_kfuch"]
 
@@ -86,6 +85,11 @@ hand_pose_set = SubResource("Resource_vfpp6")
 [node name="HandPoseController" parent="XROrigin3D/LeftTrackHand/HandPoseDetector" instance=ExtResource("6_ri3xl")]
 controller_action_map = SubResource("Resource_2hmu8")
 
+[node name="FunctionPointer" parent="XROrigin3D/LeftTrackHand" instance=ExtResource("9_3t07t")]
+show_laser = 2
+laser_length = 1
+show_target = true
+
 [node name="RightTrackHand" type="XRNode3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1, 0)
 tracker = &"right_hand"
@@ -103,19 +107,20 @@ hand_pose_set = SubResource("Resource_eibak")
 controller_tracker_name = "/user/hand_pose_controller/right"
 controller_action_map = SubResource("Resource_xlb2k")
 
+[node name="FunctionPointer" parent="XROrigin3D/RightTrackHand" instance=ExtResource("9_3t07t")]
+show_laser = 2
+laser_length = 1
+show_target = true
+
 [node name="LeftVirtualController" type="XRController3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1, 0)
 tracker = &"/user/hand_pose_controller/left"
 script = ExtResource("10_et71k")
 
-[node name="LeftHand" parent="XROrigin3D/LeftVirtualController" instance=ExtResource("11_uflga")]
-
 [node name="RightVirtualController" type="XRController3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1, 0)
 tracker = &"/user/hand_pose_controller/right"
 script = ExtResource("12_jh75a")
-
-[node name="RightHand" parent="XROrigin3D/RightVirtualController" instance=ExtResource("13_hlha2")]
 
 [node name="Blocks" type="Node3D" parent="."]
 
