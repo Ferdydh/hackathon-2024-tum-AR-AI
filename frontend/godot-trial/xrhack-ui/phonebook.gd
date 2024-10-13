@@ -5,6 +5,7 @@ extends CanvasLayer  # Inherit from CanvasLayer since PhoneBook is a CanvasLayer
 @onready var http_request: HTTPRequest = $HTTPRequest  # HTTPRequest node reference
 @onready var canvas_layer = get_node("/root/Main/DetailCanvas")  # Reference to the other CanvasLayer
 @onready var timer: Timer = get_node("/root/Main/Timer")
+@onready var scroll_container: ScrollContainer = $ScrollContainer
 
 # Called when the node is ready
 func _ready() -> void:
@@ -36,12 +37,8 @@ func _on_request_completed(result: int, response_code: int, headers: PackedStrin
 				# Connect the button's pressed signal to a function to handle clicks and pass friend data
 				new_entry.pressed.connect(self._on_friend_button_pressed.bind(friend))
 				container.add_child(new_entry)
-				# Optionally, print out the friend details (or add them to the UI)
 				print(friend["name"] + ": " + str(friend["details"]))
-			
-			# Scroll to the bottom of the ScrollContainer
-			$ScrollContainer.scroll_vertical = $ScrollContainer.get_v_scroll_bar().max_value
-			
+						
 			# Print to confirm entries have been added
 			print("New entries added to the container.")
 		else:
@@ -49,14 +46,16 @@ func _on_request_completed(result: int, response_code: int, headers: PackedStrin
 	else:
 		print("Failed to fetch data. Response code: ", response_code)
 
-# Function to handle when a friend's button is pressed
+# TODO: update doesn't work, jadi duplicate because of ID increment.
 func _on_friend_button_pressed(friend_data: Dictionary) -> void:
-	# Call the update_ui method of the CanvasLayer to update the display
-	canvas_layer.update_ui(friend_data["name"], friend_data["details"])
-	print("You clicked on: " + friend_data["name"])
-	print("Details: " + str(friend_data["details"]))
-
-
-func _on_timer_timeout() -> void:
+	for child in container.get_children():
+		child.queue_free()
 	print('load friends')
 	load_friends()
+
+
+#func _on_timer_timeout() -> void:
+#	for child in container.get_children():
+#		child.queue_free()
+#	print('load friends')
+#	load_friends()
