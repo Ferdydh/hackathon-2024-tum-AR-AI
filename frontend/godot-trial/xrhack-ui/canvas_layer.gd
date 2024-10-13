@@ -6,6 +6,7 @@ extends CanvasLayer
 @onready var edit_button = $VBoxContainer/EditButton
 @onready var name_input = $VBoxContainer/NameInput
 @onready var details_input = $VBoxContainer/DetailsInput
+@onready var phonebook = get_node("/root/Main/PhoneBook")
 
 # Variable to track if we are in edit mode
 var is_editing = false
@@ -50,8 +51,10 @@ func update_ui(friend_name: String, friend_detail_list: Array, optional_param: i
 		detail_label.text = "- %s" % detail
 		details_container.add_child(detail_label)
 
+
 # Button press function to toggle between Edit and Save
 func _on_edit_button_pressed():
+	print('on edit button pressed')
 	if is_editing:
 		# If we are editing, save the data
 		save_data()
@@ -76,6 +79,7 @@ func _on_edit_button_pressed():
 			child.visible = false
 		# Change button text to "Save"
 		edit_button.text = "Save"
+	
 	is_editing = !is_editing
 
 # Function to start editing (populates the LineEdit fields with current data)
@@ -133,7 +137,8 @@ func save_data():
 		HTTPClient.METHOD_PUT,   # HTTP PUT method
 		json_string              # The request body (JSON data)
 	)
-
+	
+	phonebook.load_friends()
 	if err != OK:
 		print("Error sending PUT request: ", err)
 

@@ -2,18 +2,21 @@ extends CanvasLayer  # Inherit from CanvasLayer since PhoneBook is a CanvasLayer
 
 # Reference to the VBoxContainer where new entries will be added
 @onready var container: VBoxContainer = $ScrollContainer/VBoxContainer
-@onready var button: Button = $Button  # Reference to the button
 @onready var http_request: HTTPRequest = $HTTPRequest  # HTTPRequest node reference
+@onready var canvas_layer = get_node("/root/Main/DetailCanvas")  # Reference to the other CanvasLayer
+@onready var timer: Timer = get_node("/root/Main/Timer")
+@onready var scroll_container: ScrollContainer = $ScrollContainer
 
 # Called when the node is ready
 func _ready() -> void:
-	# Connect the button's pressed signal to the _on_button_pressed function
-	button.pressed.connect(_on_button_pressed)
 	# Connect the request_completed signal from HTTPRequest
 	http_request.request_completed.connect(self._on_request_completed)
+	# Automatically make the GET request when the scene is ready
+	load_friends()
+	timer.autostart = true
 
-# Function that gets called when the button is pressed
-func _on_button_pressed() -> void:
+# Function to load friends from the API
+func load_friends() -> void:
 	# Make a GET request to retrieve the friends data
 	var err = http_request.request("http://localhost:8000/friends")
 	if err != OK:
@@ -27,21 +30,32 @@ func _on_request_completed(result: int, response_code: int, headers: PackedStrin
 		var parse_result = json.parse(body.get_string_from_utf8())
 		if parse_result == OK:
 			var friends = json.data  # The parsed JSON data
-			# Clear previous entries in the VBoxContainer to avoid duplicates
-			# Loop through each friend and create a new label for their name
+			# Loop through each friend and create a new button for their name
 			for friend in friends:
-				var new_entry = Label.new()
+				var new_entry = Button.new()
 				new_entry.text = friend["name"]
+				# Connect the button's pressed signal to a function to handle clicks and pass friend data
+				new_entry.pressed.connect(self._on_friend_button_pressed.bind(friend))
 				container.add_child(new_entry)
-				# Optionally, print out the friend details (or add them to the UI)
 				print(friend["name"] + ": " + str(friend["details"]))
-			
-			# Scroll to the bottom of the ScrollContainer
-			$ScrollContainer.scroll_vertical = $ScrollContainer.get_v_scroll_bar().max_value
-			
+						
 			# Print to confirm entries have been added
 			print("New entries added to the container.")
 		else:
 			print("Error parsing JSON response.")
 	else:
 		print("Failed to fetch data. Response code: ", response_code)
+
+
+func _on_friend_button_pressed(friend_data: Dictionary) -> void:
+	# Call the update_ui method of the CanvasLayer to update the display
+	canvas_layer.update_ui(friend_data["name"], friend_data["details"])
+	print("You clicked on: " + friend_data["name"])
+	print("Details: " + str(friend_data["details"]))
+	
+# TODO: update doesn't work, jadi duplicate because of ID increment.
+func _on_timer_timeout() -> void:
+	for child in container.get_children():
+		child.queue_free()
+	print('load friends')
+	load_friends()

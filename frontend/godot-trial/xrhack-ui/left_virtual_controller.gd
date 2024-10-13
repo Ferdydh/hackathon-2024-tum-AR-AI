@@ -11,7 +11,7 @@ func _ready():
 	http_request.connect("request_completed", Callable(self, "_on_request_completed"))
 	
 	# Get reference to the CanvasLayer node by going up and finding the sibling
-	canvas_layer = get_node("/root/Main/CanvasLayer")  # Adjust this based on your root node name
+	canvas_layer = get_node("/root/Main/DetailCanvas")  # Adjust this based on your root node name
 	
 	# Check if canvas_layer is valid (exists in the scene)
 	if canvas_layer:
