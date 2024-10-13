@@ -54,7 +54,8 @@ poses = Array[ExtResource("3_phyhv")]([ExtResource("4_dxbsk")])
 script = ExtResource("8_ibq41")
 actions = Array[ExtResource("7_ofmb8")]([SubResource("Resource_ts875")])
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dygqj"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yp4rq"]
+bg_color = Color(0.147672, 0.147672, 0.147672, 1)
 
 [node name="Main" type="Node3D"]
 
@@ -159,9 +160,9 @@ script = ExtResource("17_kfuch")
 [node name="ScrollContainer" type="ScrollContainer" parent="PhoneBook"]
 offset_left = 852.0
 offset_top = 79.0
-offset_right = 1091.0
-offset_bottom = 435.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_dygqj")
+offset_right = 1058.0
+offset_bottom = 295.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_yp4rq")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PhoneBook/ScrollContainer"]
 layout_mode = 2
@@ -175,6 +176,11 @@ action_mode = 0
 text = "Add Entry"
 
 [node name="HTTPRequest" type="HTTPRequest" parent="PhoneBook"]
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 5.0
+
+[connection signal="timeout" from="Timer" to="PhoneBook" method="_on_timer_timeout"]
 
 [editable path="XROrigin3D/LeftTrackHand/LeftHandHumanoid2"]
 [editable path="XROrigin3D/RightTrackHand/RightHandHumanoid2"]

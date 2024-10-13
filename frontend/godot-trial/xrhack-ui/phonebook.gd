@@ -4,17 +4,18 @@ extends CanvasLayer  # Inherit from CanvasLayer since PhoneBook is a CanvasLayer
 @onready var container: VBoxContainer = $ScrollContainer/VBoxContainer
 @onready var http_request: HTTPRequest = $HTTPRequest  # HTTPRequest node reference
 @onready var canvas_layer = get_node("/root/Main/DetailCanvas")  # Reference to the other CanvasLayer
+@onready var timer: Timer = get_node("/root/Main/Timer")
 
 # Called when the node is ready
 func _ready() -> void:
 	# Connect the request_completed signal from HTTPRequest
 	http_request.request_completed.connect(self._on_request_completed)
-	
 	# Automatically make the GET request when the scene is ready
-	_load_friends()
+	load_friends()
+	timer.autostart = true
 
 # Function to load friends from the API
-func _load_friends() -> void:
+func load_friends() -> void:
 	# Make a GET request to retrieve the friends data
 	var err = http_request.request("http://localhost:8000/friends")
 	if err != OK:
@@ -54,3 +55,8 @@ func _on_friend_button_pressed(friend_data: Dictionary) -> void:
 	canvas_layer.update_ui(friend_data["name"], friend_data["details"])
 	print("You clicked on: " + friend_data["name"])
 	print("Details: " + str(friend_data["details"]))
+
+
+func _on_timer_timeout() -> void:
+	print('load friends')
+	load_friends()
