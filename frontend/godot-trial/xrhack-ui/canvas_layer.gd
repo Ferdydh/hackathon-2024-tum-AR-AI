@@ -50,6 +50,7 @@ func update_ui(friend_name: String, friend_detail_list: Array, optional_param: i
 		detail_label.text = "- %s" % detail
 		details_container.add_child(detail_label)
 
+
 # Button press function to toggle between Edit and Save
 func _on_edit_button_pressed():
 	if is_editing:
